@@ -13,10 +13,21 @@ This reference describes the [repository source](README.md#about-these-docs). Se
 | `src/server/` | Composition, admission, liveness, HTTP-facing services; `chat-handler.ts`, `jobs.ts`, `stores.ts` |
 | `src/agent/` | Agent construction, tools, provider streams, workers; `teacher-agent.ts`, `models.ts`, `tools.ts`, `subagents/` |
 | `src/core/` | Contracts, record/view projections, domain algorithms; `input-events.ts`, `native-messages.ts`, `view.ts`, `graph.ts` |
-| `src/store/` | Filesystem adapters for chats, jobs, graph, settings, and credentials |
+| `src/store/` | File-backed chat, graph, and settings adapters; SQLite lesson, notes, and source-library stores |
 | `electron/` | Desktop launch, navigation/permission guards, credential transport, browser helper, updater |
 
 [`eslint.config.mjs`](../eslint.config.mjs) restricts shell imports into `src/` to the core/server barrels, prevents core imports from IO layers, and prevents agents importing server/store adapters. Dependencies arrive through injected contexts/ports. These rules are not a proof of pure core, one composition root, or one writer per store: some core modules are Node-bound and excluded from the browser barrel; server modules can import adapters. Scripts, Electron, and tests are outside these zones.
+
+## Fork learning workspaces
+
+The fork adds explicit lesson sessions, source-backed roadmaps, coding exercises, and an independent Notes library alongside the original chat and learning graph. The [learning workspace guide](personal-learning-harness.md) describes their user-facing behavior.
+
+- `src/core/learning-session.ts` defines lesson phases, objective evidence, and transitions; `src/server/learning-workspace.ts` and `src/store/learning-workspace.ts` expose and persist them in SQLite. Lesson turns use `src/agent/learning-agent.ts` with the existing conversation infrastructure.
+- `src/server/source-library.ts`, `src/server/source-ingestion.ts`, and `src/store/source-library.ts` manage source goals, extracted passages, roadmaps, and locks. Roadmap generation is model-assisted.
+- `src/server/notes.ts` and `src/store/notes.ts` manage a separate SQLite notes library, including snippets and revision history. Its concept graph is independent of the learning graph.
+- `src/server/coding-exercises.ts` validates generated exercise cases and reference solutions. `src/server/exercise-runner.ts` executes code in Docker using locally pinned image IDs; see [runner setup](../scripts/runners/README.md).
+
+These SQLite stores supplement the existing file-backed records; they do not replace the conversation and graph persistence described below.
 
 ## Conversations and turns
 

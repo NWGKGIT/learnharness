@@ -1,6 +1,6 @@
 # Getting started
 
-Download LearnHarness from [learnharness.ai](https://learnharness.ai) or [GitHub Releases](https://github.com/amosblomqvist/learnharness/releases). For running from source, see [Development](development.md).
+For Linux x64 packages, see [this fork’s GitHub Releases](https://github.com/NWGKGIT/learnharness/releases). Packages are produced by the [Linux release workflow](desktop-release.md). For running from source, see [Development](development.md).
 
 ## Connect models
 
@@ -17,13 +17,11 @@ Optional web search supports Tavily, Brave, Exa, Firecrawl, and hosted Ollama se
 
 ## Start a session
 
-Choose **Teach** and describe what you want to understand. The agent probes your starting point, presents a plan, and teaches through explanations and checks. Reply naturally to accept or revise the plan.
+Choose **Learn**, describe a topic, and select guided advancement or strict mastery. The session can start with a short, skippable diagnostic, then presents a lesson map and explanations. Start the **Grill** when you are ready to assess your understanding. The sidebar also has a standalone **Grill** entry for assessment without the initial diagnostic and explanation.
 
-Use the thinking fields to explain your reasoning, uncertainty, or reaction—not only your selected answer. You can type or dictate. Your confidence is self-reported, not an independent assessment.
+Choose **Practice** for separate problem sessions. Use the thinking fields to explain your reasoning and uncertainty; you can type or dictate. Sessions are saved locally, including earlier messages when context is compacted.
 
-Choose **Practice** for problems rather than a lesson. Start from selected graph material or describe material directly. Submit your thinking as you work; the model's committed solution is revealed when the problem concludes. Use **Next problem** when ready to continue.
-
-Sessions are saved locally, including earlier messages when context is compacted. The [keyboard guide](keyboard.md) covers submission, focus, question controls, and cancellation.
+Use **Sources** to collect material for a learning goal, generate a roadmap, lock it after review, and start source-based lessons. Use **Notes** for an independent, searchable library and concept graph. Lessons can include coding exercises after [Docker runner setup](../scripts/runners/README.md). See the [learning workspace guide](personal-learning-harness.md) for details, and the [keyboard guide](keyboard.md) for navigation and controls.
 
 ## Dictation
 
@@ -69,4 +67,4 @@ API-key files sit beside `data`, not inside it. They are plaintext with restrict
 
 Click the context/cost row beneath the composer for Session stats. Dollar figures estimate known API costs; subscription, CLI, and custom-endpoint usage are not treated as free. See [context, caching, and costs](compaction-accounting.md) for the details.
 
-Packaged apps support updates under **Settings → General**. Development builds do not run the updater. Report problems through [GitHub Issues](https://github.com/amosblomqvist/learnharness/issues), with reproduction steps and the app/OS version rather than private learning records or keys.
+Packaged apps support updates under **Settings → General**. Development builds do not run the updater. Report fork problems through [GitHub Issues](https://github.com/NWGKGIT/learnharness/issues), with reproduction steps and the app/OS version rather than private learning records or keys.
