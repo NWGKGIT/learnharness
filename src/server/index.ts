@@ -5,6 +5,8 @@
  */
 
 export * from "./chat-handler.ts";
+export { startExercise, exerciseStatus, cancelExercise } from "./exercises.ts";
+export { learningWorkspace, lessonHttp, createLearningLesson, existingLearningSession } from "./learning-workspace.ts";
 export * from "./events-stream.ts";
 export * from "./chats.ts";
 export * from "./graph.ts";
@@ -54,3 +56,9 @@ export { claudeCodeInstallationResponse } from "./claude-code.ts";
 // No import side effects; the boot sync lives in stores.ts.
 export * from "./custom-provider.ts";
 export { customProviderGet, customProviderMutation } from "./custom-provider-http.ts";
+
+export { notesSnapshot, notesAction } from "./notes.ts";
+
+export { sourceLibrarySnapshot, sourceLibraryAction } from "./source-library.ts";
+
+export { currentCodingExercise } from "./coding-exercises.ts";

@@ -56,12 +56,12 @@
 	   appearance settings vars. */
 	--lh-ink-strong: var(--foreground);
 	--lh-ink-italic: var(--foreground);
-	/* THE READING SIZE = the ladder's 16px rung (--text-lg). Can't be
+	/* THE READING SIZE = the ladder's 14px rung (--text-base). Can't be
 	   var()-linked: @theme inline inlines literals into utilities without
 	   emitting runtime vars — so this is the one documented duplication:
 	   change one, change both. (owner, typography round 4: snapped from
 	   the reskin's hand-tuned 16.5 to the ladder's 16.) */
-	--lh-prose-size: 16px;
+	--lh-prose-size: 14px;
 	--lh-prose-leading: 1.5;
 	/* Markdown heading weight (appearance settings; 900 = the Black cut). */
 	--lh-heading-weight: 900;
@@ -91,12 +91,12 @@
 	/* Same emphasis ruling as the block above: unset = text color. */
 	--lh-ink-strong: var(--foreground);
 	--lh-ink-italic: var(--foreground);
-	/* THE READING SIZE = the ladder's 16px rung (--text-lg). Can't be
+	/* THE READING SIZE = the ladder's 14px rung (--text-base). Can't be
 	   var()-linked: @theme inline inlines literals into utilities without
 	   emitting runtime vars — so this is the one documented duplication:
 	   change one, change both. (owner, typography round 4: snapped from
 	   the reskin's hand-tuned 16.5 to the ladder's 16.) */
-	--lh-prose-size: 16px;
+	--lh-prose-size: 14px;
 	--lh-prose-leading: 1.5;
 	/* Markdown heading weight (appearance settings; 900 = the Black cut). */
 	--lh-heading-weight: 900;
@@ -127,7 +127,7 @@
 	   round 4: the 10px rung is merged into 11 — one pixel apart was a
 	   distinction with no visible difference, and 10px sits at the mono
 	   legibility floor; quiet labels get their quiet from color +
-	   tracking, not a notch of size. Reading prose = the 16px rung via
+	   tracking, not a notch of size. Reading prose = the 14px rung via
 	   --lh-prose-size.) */
 	/* --font-title lives in the NON-inline @theme below: inline tokens get
 	   their literal values baked into the utilities (.font-title{font-family:

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { MenuShell } from "@/components/menu-shell";
 import { DeleteSessionDialog } from "@/components/delete-session-dialog";
 import type { ChatDeleteMode } from "@/src/core";
-import { DumbbellIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { DumbbellIcon, FlameIcon, NotebookPenIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
 import { ActivitySection } from "@/components/activity-dock";
 import { CoverageMenuBlock } from "@/components/extraction-coverage";
 import { LhMark } from "@/components/lh-mark";
@@ -411,7 +411,7 @@ function SessionsSidebar() {
 	   message is sent (and that message becomes its title). Search: a
 	   client-side filter over the poll snapshot — no server round trip. */
 	const newSession = useCallback(() => {
-		router.push("/chat/new");
+		router.push("/learn");
 	}, [router]);
 
 	/* FUZZY (owner round 8, 2026-10-05): subsequence match ranked by
@@ -697,15 +697,18 @@ function SessionsSidebar() {
 				    labels room; teaching keeps the original draft route,
 				    practice carries its mode. */}
 				<div className="mx-3 mb-2 flex flex-col gap-1.5">
+					<Link href="/sources" className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">Sources</Link>
+					<Link href="/notes" className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><NotebookPenIcon className="size-3" aria-hidden="true" />Notes</Link>
+					<Link href="/grill" className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><FlameIcon className="size-3" aria-hidden="true" />Grill<span className="sr-only">assess understanding and repair gaps</span></Link>
 					<button
 						type="button"
 						data-testid="new-session"
-						onClick={() => void newSession()}
+						onClick={() => router.push("/learn")}
 						className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 					>
 						<PlusIcon className="size-3" />
-						Teaching
-						<span className="sr-only">create a new teaching session</span>
+						Learn
+						<span className="sr-only">create a new lesson</span>
 					</button>
 					<button
 						type="button"
@@ -801,7 +804,7 @@ function SessionsSidebar() {
 									: "text-muted-foreground hover:text-foreground",
 							)}
 						>
-							{f === "teach" ? "Teaching" : f === "all" ? "All" : "Practice"}
+							{f === "teach" ? "Lessons" : f === "all" ? "All" : "Practice"}
 						</button>
 					))}
 				</div>

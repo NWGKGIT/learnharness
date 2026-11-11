@@ -120,6 +120,8 @@ export interface CanvasColors {
 }
 
 export interface CanvasData {
+	/** False draws undirected relationships for independent Notes graphs. */
+	directed?: boolean;
 	nodes: CanvasNode[];
 	edges: CanvasEdge[];
 	/** The LOGICAL arrows (proposition→conclusion, imp contracted) the
@@ -1267,7 +1269,7 @@ export class GraphCanvasRenderer {
 			const g = arrowGeometry(a, b, outOfImp ? 0 : nodeR, intoImp ? 0 : nodeR, arrowLen);
 			if (!g) continue;
 			shafts.moveTo(g.shaftFrom.x, g.shaftFrom.y);
-			if (intoImp) {
+			if (intoImp || data.directed === false) {
 				// toRadius 0 put the tip AT the imp node's center: the
 				// headless shaft terminates there (no head triangle).
 				shafts.lineTo(g.tip.x, g.tip.y);

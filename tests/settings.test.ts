@@ -30,7 +30,7 @@ describe("FACTORY_SETTINGS (the compiled factory layer)", () => {
 		assert.equal(a.mode, "dark");
 		assert.equal(a.background, null); // the mode's own default, not a factory hex
 		assert.equal(a.fontFamily, null); // Source Sans 3
-		assert.equal(a.proseFontSize, 16);
+		assert.equal(a.proseFontSize, 14);
 		assert.equal(a.sessionNameSerif, true);
 		assert.equal(a.mdRendering.headingWeight, 900);
 		assert.equal(a.mdRendering.boldColor, null); // white

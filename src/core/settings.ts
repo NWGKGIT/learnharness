@@ -513,7 +513,7 @@ export const FACTORY_SETTINGS: FactorySettings = {
 		mode: "dark",
 		background: null, // the dark default (#141414) lives in the mode's derivation curve
 		fontFamily: null, // Source Sans 3
-		proseFontSize: 16,
+		proseFontSize: 14,
 		sessionNameSerif: true,
 		mdRendering: { headingWeight: 900, boldColor: null, italicColor: null },
 	},
