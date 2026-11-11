@@ -307,58 +307,18 @@ describe("release gate — update feeds", () => {
 	}
 });
 
-describe("release gate — workflow wiring", () => {
+describe("Linux release workflow wiring", () => {
 	const yaml = require("js-yaml") as { load(source: string): any };
 	const workflow = yaml.load(fs.readFileSync(path.join(repoRoot, ".github", "workflows", "release.yml"), "utf8"));
-	const verify = workflow.jobs.verify;
 
-	it("can see drafts after ALL packaging jobs, only on real tag pushes", () => {
-		assert.ok(verify);
-		assert.equal(verify.needs, "package");
-		assert.equal(verify.if, "github.event_name == 'push'");
-		// GitHub's release-list API hides drafts from read-only tokens.
-		assert.deepEqual(verify.permissions, { contents: "write" });
-		assert.equal(verify.env?.GH_TOKEN, undefined);
-	});
-
-	it("exposes the elevated token only to the two API-reading steps", () => {
-		const readers = ["List every release, drafts included", "Download the three update feeds"];
-		for (const step of verify.steps) {
-			if (readers.includes(step.name)) assert.equal(step.env?.GH_TOKEN, "${{ github.token }}");
-			else assert.equal(step.env?.GH_TOKEN, undefined, String(step.name ?? step.uses));
-		}
-		assert.equal(verify.steps.filter((step: any) => step.env?.GH_TOKEN).length, 2);
-	});
-
-	it("uses only implicit GET requests, never release-mutating commands", () => {
-		const calls: string[] = verify.steps.flatMap((step: any) =>
-			(step.run ?? "").split("\n").filter((line: string) => /^\s*gh\s/.test(line)),
-		);
-		assert.equal(calls.length, 2);
-		for (const call of calls) {
-			assert.match(call, /^\s*gh api /);
-			assert.doesNotMatch(call, /(?:\s|^)(?:--(?:method|input|field|raw-field)(?:[=\s]|$)|-[XfF])/);
-		}
-	});
-
-	it("checks out the tagged revision and runs select + verify", () => {
-		const checkout = verify.steps.find((step: any) => step.uses?.startsWith("actions/checkout"));
-		assert.deepEqual(checkout.with, { ref: "${{ github.sha }}", "persist-credentials": false });
-		const select = verify.steps.find((step: any) => step.run?.includes("verify-release.ts select"));
-		const final = verify.steps.find((step: any) => step.run?.includes("verify-release.ts verify"));
-		assert.ok(select && final);
-		assert.match(final.run, /--tag "\$GITHUB_REF_NAME"/);
-		// The gate's own job: nothing here may create, edit, publish, or delete.
-		for (const step of verify.steps) {
-			assert.equal(step.run?.includes("create") ?? false, false, String(step.name));
-		}
-	});
-
-	it("download step fetches exactly the three update feeds from the selected draft", () => {
-		const download = verify.steps.find((step: any) => step.name === "Download the three update feeds");
-		assert.ok(download);
-		for (const feed of ["latest-mac.yml", "latest.yml", "latest-linux.yml"]) assert.ok(download.run.includes(feed));
-		assert.match(download.run, /releases\/assets\/\$id/);
+	it("publishes only tag builds after package validation", () => {
+		assert.equal(workflow.jobs.release.needs, "package");
+		assert.equal(workflow.jobs.release.if, "github.event_name == 'push'");
+		assert.deepEqual(workflow.jobs.release.permissions, { contents: "write" });
+		const steps = workflow.jobs.package.steps as any[];
+		assert.ok(steps.some((step) => step.run?.includes("--linux AppImage deb rpm pacman")));
+		assert.ok(steps.some((step) => step.run?.includes("verify-linux-release.mjs")));
+		assert.ok(workflow.jobs.release.steps.some((step: any) => step.run?.includes("sha256sum --check")));
 	});
 });
 

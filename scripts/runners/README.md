@@ -19,4 +19,4 @@ Run the real Docker smoke tests after setup:
 LH_RUN_DOCKER_TESTS=1 NODE_ENV=test node --import tsx --test tests/exercise-runner.test.ts
 ```
 
-A successful process exit is not a mastery grade. Running and submitting an answer are separate actions. Automated exercise test-suite generation and reference-solution verification are not implemented yet.
+A successful process exit is not a mastery grade. Running and submitting an answer are separate actions. Tutor-authored exercises include visible examples and hidden cases. The reference solution is executed against the cases before the exercise is made available; submission reveals the hidden cases and later attempts are marked assisted.

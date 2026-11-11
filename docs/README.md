@@ -2,6 +2,7 @@
 
 ## User guides
 
+- [Learning workspace](personal-learning-harness.md) — lessons, Grill, coding exercises, Sources, and Notes.
 - [Getting started](getting-started.md) — connections, models, sessions, dictation, files, and notes imports.
 - [Keyboard shortcuts](keyboard.md) — defaults, rebinding, and navigation.
 - [Claude Code](claude-code.md) — use an installed CLI and troubleshoot its connection.
