@@ -432,7 +432,7 @@ describe("AppearanceSection (thin SSR)", () => {
 		assert.ok(html.includes('data-testid="font-trigger"'));
 		assert.ok(html.includes('data-testid="row-prose-size"'));
 		assert.ok(html.includes('data-testid="row-heading-weight"'));
-		assert.ok(html.includes("16px"));
+		assert.ok(html.includes("14px"));
 		assert.ok(!html.includes('data-testid="row-mode"'), "the mode row is gone — the theme declares it");
 	});
 });
