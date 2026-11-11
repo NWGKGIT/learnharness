@@ -83,6 +83,11 @@ export function DraftShell({
 	onOpenPicker,
 	onClearPicks,
 	overlay,
+	title,
+	description,
+	placeholder,
+	beforeComposer,
+	sendEnabled = true,
 }: {
 	busy: boolean;
 	text: string;
@@ -110,6 +115,11 @@ export function DraftShell({
 	 *  the graph view (the overlay fills its column, never the sidebar).
 	 *  Passed as a node so the pick state stays in NewSession. */
 	overlay?: ReactNode;
+	title?: string;
+	description?: string;
+	placeholder?: string;
+	beforeComposer?: ReactNode;
+	sendEnabled?: boolean;
 }) {
 	const controller = useOptionalInteractionLayers();
 	const pathname = usePathname();
@@ -132,7 +142,7 @@ export function DraftShell({
 	// round, owner 2026-10-01): the spoken text is deferred in the run's
 	// buffer — Enter must reach the finish-first send, not be gated out by
 	// an empty textarea. Nothing said → the send no-ops.
-	const canSend = text.trim().length > 0 || dictation.active;
+	const canSend = sendEnabled && (text.trim().length > 0 || dictation.active);
 	/* FINISH DICTATION FIRST (owner, 2026-10-01): stop the run, let the
 	 * last finals land through onChange, THEN call the parent's send —
 	 * which reads its REF mirror, so the post-await timing of React's
@@ -178,11 +188,11 @@ export function DraftShell({
 						<Conversation className="h-full min-w-0 flex-1" initial="instant">
 							<ConversationContent className="min-h-full gap-0 p-0">
 								<ConversationEmptyState
-									title={mode === "practice" ? "New practice session" : "New session"}
+									title={title ?? (mode === "practice" ? "New practice session" : "New session")}
 									description={
-										mode === "practice"
+										description ?? (mode === "practice"
 											? "Pick nodes from your knowledge graph, describe what you want to practice, or bring your own problem."
-											: "The teacher will open by probing what you already know."
+											: "The teacher will open by probing what you already know.")
 									}
 								/>
 							</ConversationContent>
@@ -190,6 +200,7 @@ export function DraftShell({
 						<div className="h-24 bg-gradient-to-t from-background via-background/85 to-transparent" />
 						<div className="bg-background pb-4">
 							<div className={DOCK}>
+								{beforeComposer && <div className="pointer-events-auto mb-2">{beforeComposer}</div>}
 								<ComposerActions
 									picker={(picks.length > 0 || mode === "practice") && (
 										<NodePickerControl count={picks.length} onOpen={onOpenPicker} onClear={onClearPicks} />
@@ -212,7 +223,7 @@ export function DraftShell({
 										// input (owner refinement round, 2026-09-24) — no lesson has
 										// started yet, so the composer must not read like one is in
 										// flight.
-										placeholder={mode === "practice" ? "What do you want to practice?" : "What do you want to learn?"}
+										placeholder={placeholder ?? (mode === "practice" ? "What do you want to practice?" : "What do you want to learn?")}
 									/>
 								</div>
 								<StatsBar

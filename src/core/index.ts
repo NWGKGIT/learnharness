@@ -98,6 +98,13 @@ export * from "./coverage.ts";
 // ONE session→markdown formatter — the extractor's view and the user-facing
 // export share it. Pure, browser-safe.
 export * from "./session-markdown.ts";
+export type { LessonSession, LessonPhase, LessonAction } from "./learning-session.ts";
+export type { ExerciseLanguage, ExerciseRun, PublicCodingExercise, CodingExercise, ExerciseCase, ExerciseCaseResult } from "./exercises.ts";
+export { lessonPlan, lessonPlanStatuses } from "./learning-session.ts";
+
+export * from "./notes.ts";
+
+export * from "./source-library.ts";
 // side-chat.ts (shared side conversations): ask-input validation,
 // thread lookup and the side model's lesson document. Pure, browser-safe.
 export * from "./side-chat.ts";

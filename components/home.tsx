@@ -121,6 +121,11 @@ export function Home({
 	const begin = async () => {
 		const t = topicRef.current.trim();
 		if (!t || startingRef.current) return;
+		if (mode === "teach") {
+			const context = practiceProps.length ? `\n\nSelected concepts:\n${practiceProps.map((p) => `${p.name}: ${p.statement}`).join("\n")}` : "";
+			router.push(`/learn?topic=${encodeURIComponent(t + context)}`);
+			return;
+		}
 		// Unconfigured: the send INTERCEPTS into the setup flow (the draft
 		// stays in the textarea; the learner sends it after Save).
 		if (!configured) {
@@ -314,7 +319,7 @@ export function Home({
 										}
 									>
 										{m === "practice" ? <DumbbellIcon aria-hidden="true" className="size-3" /> : null}
-										{m === "teach" ? "Teach" : "Practice"}
+									{m === "teach" ? "Learn" : "Practice"}
 									</button>
 								))}
 							</div>

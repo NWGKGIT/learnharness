@@ -747,11 +747,11 @@ const POPUP_PAD = GLOW_REACH;
  * territory. Surface 80% + blur (owner decision): the transcript ghosts
  * through while the focus owns the session area.
  */
-export function PlanPopup({ messages, onClose }: { messages: readonly PopupMessage[]; onClose: () => void }) {
-	const tree = useMemo(() => latestTree(messages), [messages]);
+export function PlanPopup({ messages, onClose, treeOverride, statusesOverride }: { messages: readonly PopupMessage[]; onClose: () => void; treeOverride?: PlanTree; statusesOverride?: ReturnType<typeof derivePlanStatuses> }) {
+	const tree = useMemo(() => treeOverride ?? latestTree(messages), [messages, treeOverride]);
 	const statuses = useMemo(
-		() => (tree ? derivePlanStatuses(tree, messages as Parameters<typeof derivePlanStatuses>[1]) : null),
-		[tree, messages],
+		() => statusesOverride ?? (tree ? derivePlanStatuses(tree, messages as Parameters<typeof derivePlanStatuses>[1]) : null),
+		[tree, messages, statusesOverride],
 	);
 	const statusOf = (id: string): PlanNodeStatus => (statuses ? derivedNodeStatus(statuses, id) : "upcoming");
 

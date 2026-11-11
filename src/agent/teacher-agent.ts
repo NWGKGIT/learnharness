@@ -110,6 +110,8 @@ export type StepUsageCollector = (usage: Usage) => void;
 
 /** Per-request construction options (the handler wires all of these). */
 export interface AgentBuildOptions {
+	/** Explicit-state lessons supply their own doctrine rather than legacy probing fragments. */
+	instructions?: string;
 	/** Model + stream function — tests inject a scripted faux engine. */
 	engine?: PiEngine;
 	callPurpose?: { background: boolean };
@@ -211,9 +213,9 @@ function baseAgentOptions(kind: AgentKind, opts: AgentBuildOptions, tools: Agent
 	const stopper = makeQuestionStopper(kind);
 	const narrationGuard = narrationGuardApplies(kind, engine.model, opts.tools !== undefined);
 	const narrationHooks = narrationGuard ? makeNarrationGuard() : undefined;
-	const composedPrompt = opts.promptSwitches
+	const composedPrompt = opts.instructions ?? (opts.promptSwitches
 		? composeInstructions(kind, opts.promptSwitches)
-		: composedInstructions[kind]!;
+		: composedInstructions[kind]!);
 	const builtinPrompt = narrationGuard ? `${composedPrompt}\n\n---\n\n${SEND_TO_USER_DELIVERY_RULE}` : composedPrompt;
 	// Bind native read and preserve the kind/model-aware Claude output gate
 	// before resolving additive plugins. Explicit registries remain caller-owned.

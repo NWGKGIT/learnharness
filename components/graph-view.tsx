@@ -1019,14 +1019,31 @@ export function GraphView({
 	}, [chainSelectOpen]);
 	useEffect(() => {
 		let cancelled = false;
-		fetch("/api/graph")
-			.then((res) => res.json() as Promise<GraphSnapshot>)
+		const controller = new AbortController();
+		const loadGraph = async (): Promise<GraphSnapshot> => {
+			for (let attempt = 0; ; attempt++) {
+				let res: Response;
+				try {
+					res = await fetch("/api/graph", { signal: controller.signal });
+				} catch (err) {
+					// Retry connection failures only; cleanup must never start a new request.
+					if (controller.signal.aborted || attempt >= 2) throw err;
+					continue;
+				}
+				if (!res.ok) throw new Error(`Graph request failed: HTTP ${res.status}`);
+				return res.json() as Promise<GraphSnapshot>;
+			}
+		};
+		loadGraph()
 			.then((data) => {
 				if (!cancelled) setSnapshot(data);
 			})
-			.catch((err) => console.error("[graph] fetch failed:", err));
+			.catch((err) => {
+				if (!cancelled) console.error("[graph] fetch failed:", err);
+			});
 		return () => {
 			cancelled = true;
+			controller.abort();
 		};
 	}, [refreshTick]);
 

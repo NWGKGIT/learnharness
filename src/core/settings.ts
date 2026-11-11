@@ -545,7 +545,7 @@ export const FACTORY_SETTINGS: FactorySettings = {
 		background: null, // null = the active theme's background
 		colors: {}, // no overrides: every color is the theme's
 		fontFamily: null, // Source Sans 3
-		proseFontSize: 16,
+		proseFontSize: 14,
 		codeLigatures: false,
 		sessionNameSerif: true,
 		mdRendering: { headingWeight: 900, boldColor: null, italicColor: null },

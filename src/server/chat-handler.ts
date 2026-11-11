@@ -7,6 +7,10 @@ import {
 	type TeachingAgent,
 } from "../agent/teacher-agent.ts";
 import { piEngineForSpec, type PiEngine } from "../agent/models.ts";
+import { publishCodingExercise } from "./coding-exercises.ts";
+import { lessonSourceMaterial } from "./source-library.ts";
+import { createLearningAgent } from "../agent/learning-agent.ts";
+import { learningWorkspace, existingLearningSession } from "./learning-workspace.ts";
 import { connectionBackgroundAllowed as subscriptionBackgroundAllowed, connectionScopeCurrent, isSubscriptionProvider } from "../agent/subscription-connections.ts";
 import { nativeSubscriptionError } from "../agent/subscription-stream.ts";
 import { chatGPTStreamError } from "../agent/chatgpt-stream.ts";
@@ -733,6 +737,14 @@ export async function handleChatInput(
 	// uniform across kinds).
 	const constructed: TeachingAgent = buildAgent
 		? buildAgent({ ...agentOpts, teaching })
+		: existingLearningSession(chatId)
+			? createLearningAgent({
+				material: lessonSourceMaterial(chatId),
+				readExerciseRun: (id) => { const run = learningWorkspace().getRun(id); return run?.lessonId === chatId ? run : null; },
+				publishExercise: (input, signal) => publishCodingExercise(chatId, input, signal),
+				read: () => learningWorkspace().get(chatId)!,
+				apply: (revision, action) => learningWorkspace().apply(chatId, revision, action),
+			}, agentOpts)
 		: record.kind === "practice"
 			? createPracticeAgent(
 					{

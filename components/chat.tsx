@@ -3,6 +3,11 @@
 import { createContext, Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useChatSession } from "@/components/session";
+import { LessonControls } from "./lesson-controls";
+import { ExerciseWorkspace } from "./exercise-workspace";
+import { LessonNavigation } from "./lesson-navigation";
+import { LessonPlan } from "./lesson-plan";
+import { lessonPlan, lessonPlanStatuses, type LessonSession } from "@/src/core";
 import { usePlugins } from "./plugins";
 import { PluginSubmissionRunner, SubmissionModelEpoch, type SubmissionAttempt } from "./plugin-submission-runner";
 import { submissionImages, type BuiltinSubmissionCapture, type PrepareBuiltinSubmission, type PrepareThinkingSubmission, type PreparePluginQuestionSubmission, type PreparePluginProblemSubmission } from "./plugin-submission-adapters";
@@ -271,6 +276,7 @@ export function Chat({
 	initiallyCompacting = false,
 	initialConfigured = false,
 	kind = "teach",
+	isLearningLesson = false,
 }: {
 	chatId: string;
 	title: string;
@@ -281,6 +287,7 @@ export function Chat({
 	 *  renders no phase chip (no probe→teach arc applies) and a Practice
 	 *  tag rides the header instead. */
 	kind?: "teach" | "practice";
+	isLearningLesson?: boolean;
 	initialPrompt?: string;
 	/** A teacher turn is running server-side but attached to no client
 	 * (navigated away mid-turn, returned while in flight). */
@@ -1232,6 +1239,8 @@ export function Chat({
 	// The live plan popup (wave 4): opened by any transcript plan block, the
 	// top-bar plan chip, and the dock band's marginalia.
 	const [planOpen, setPlanOpen] = useState(false);
+	const [lessonSession, setLessonSession] = useState<LessonSession | null>(null);
+	const [codeOpen, setCodeOpen] = useState(false);
 	// Real plan presence — gates the marginalia's clickable flank. A JSX
 	// element is always truthy; gating on the node alone mounted a phantom
 	// (invisible, clickable) button in the bottom-right whenever a question
@@ -1266,7 +1275,7 @@ export function Chat({
 	setupOpenRef.current = setupOpen;
 	// The session's live plan (drives the top-bar chip; the marginalia
 	// derives its own from the same transcript).
-	const planTree = useMemo(() => latestTree(messages), [messages]);
+	const planTree = useMemo(() => lessonSession?.sections.length ? lessonPlan(lessonSession) : latestTree(messages), [messages, lessonSession]);
 
 	// ── Session usage (wave-4 stats bar) ──
 	// The money channel: the record's turns log and read-time server Pi
@@ -1618,7 +1627,9 @@ export function Chat({
 		    dock overlays the column bottom (outside the scroller); a spacer in
 		    the transcript reserves its height. */}
 		<div className="flex h-dvh">
+			{isLearningLesson && lessonSession && <LessonNavigation session={lessonSession} onOpen={() => setPlanOpen(true)} />}
 			<div className="flex min-w-0 flex-1 flex-col">
+				{isLearningLesson && <LessonControls chatId={chatId} onSession={setLessonSession} busy={busy || compacting} onContinue={(text) => { void send({ type: "text", text }); }} />}
 				{/* The top bar is its own block (owner, top-fade round 4): in flow
 				    above the scroller on the plain page background — no gradient. Its
 				    bottom outline (border-b border-border) matches the one that
@@ -1716,6 +1727,7 @@ export function Chat({
 						</button>
 </Hint>
 					)}
+					{isLearningLesson && <button type="button" onClick={() => setCodeOpen((open) => !open)} className="lh-no-drag rounded border px-2 py-1 text-xs">Code workspace</button>}
 					{/* The extraction ring (owner-locked redesign, 2026-09-24): fills
 					    with uncovered vs the chunk threshold, pulses while a run is in
 					    flight, vanishes when the graph is off. Click → the exact
@@ -1737,7 +1749,7 @@ export function Chat({
 							Practice
 						</span>
 					) : (
-						<PhaseChip phase={phases.at(-1) ?? "probe"} />
+						!isLearningLesson && <PhaseChip phase={phases.at(-1) ?? "probe"} />
 					)}
 					{renderedActionContext && <PluginTopBarActions context={renderedActionContext} captureContext={captureActionContext} />}
 				</TopBar>
@@ -1752,7 +1764,7 @@ export function Chat({
 							{messages.length === 0 && !busy && (
 								<ConversationEmptyState
 									title="New session"
-									description="The teacher will open by probing what you already know."
+									description={isLearningLesson ? "A brief optional check, then a full explanation. Start the grill when you’re ready." : "The teacher will open by probing what you already know."}
 								/>
 							)}
 
@@ -1835,7 +1847,7 @@ export function Chat({
 									PREPENDED, never a replacement branch: the teach group is a real
 									message with content — a replacement ternary swallowed the entire
 									first lesson block (the Lacan session, 2026-09-27). */}
-									{m.role === "assistant" &&
+									{!isLearningLesson && m.role === "assistant" &&
 									mi > 0 &&
 									phases[mi] === "teach" &&
 									phases[mi - 1] !== "teach" &&
@@ -1882,7 +1894,7 @@ export function Chat({
 												// The step boundary where teaching begins (round 8): when
 												// the teach flip happens in a LATER step, its PhaseDivider
 												// replaces this boundary's plain hairline.
-												const teachBoundary =
+												const teachBoundary = !isLearningLesson &&
 													m.role === "assistant" &&
 													mi > 0 &&
 													phases[mi] === "teach" &&
@@ -1928,6 +1940,10 @@ export function Chat({
 															{renderSideEntry(sideEntries.get(m.id)?.get(pi))}
 															{teachBoundary ? <PhaseDivider phase="teach" /> : pi > 0 ? <Separator className="my-3" /> : null}
 														</Fragment>;
+													case "tool-coding_exercise":
+														return <div key={pi} className="my-3 rounded border p-3 text-sm">{part.state === "input-streaming" ? "Preparing and validating a coding exercise…" : <button type="button" className="underline" onClick={() => setCodeOpen(true)}>Open coding exercise</button>}</div>;
+													case "tool-lesson_update":
+														return (part.input as { action?: { type?: string } } | undefined)?.action?.type === "set-outline" && part.state === "output-available" && lessonSession ? <LessonPlan key={pi} session={lessonSession} onOpen={() => setPlanOpen(true)} /> : null;
 													case "data-plan-block":
 														// The plan in the chat (wave 4): a frozen snapshot
 														// block — rendered as carried, never re-derived.
@@ -2070,7 +2086,7 @@ export function Chat({
 					onSubmitThinking={submitThinking}
 					chatId={chatId}
 					onModelChange={recordSelectedModel}
-					plan={hasPlan ? <PlanMarginalia messages={messages} /> : undefined}
+					plan={hasPlan ? lessonSession ? <button type="button" className="text-xs underline" onClick={() => setPlanOpen(true)}>Open lesson map</button> : <PlanMarginalia messages={messages} /> : undefined}
 					onOpenPlan={() => setPlanOpen(true)}
 					requiresReveal={requiresReveal}
 					readingThinking={readingThinkingSeed.value}
@@ -2201,7 +2217,7 @@ export function Chat({
 						onClose={() => setFigureFocus(null)}
 					/>
 				)}
-				{planOpen && <PlanPopup messages={messages} onClose={() => setPlanOpen(false)} />}
+				{planOpen && <PlanPopup messages={messages} treeOverride={lessonSession ? lessonPlan(lessonSession) : undefined} statusesOverride={lessonSession ? lessonPlanStatuses(lessonSession) : undefined} onClose={() => setPlanOpen(false)} />}
 				<SelectionToolbar viewport={transcriptElement} actions={selectionActions} />
 				{citationEdit && (
 					<CitationCommentPopover
@@ -2221,6 +2237,7 @@ export function Chat({
 				<AbortTurnDialog mode={abortAsk} onClose={closeAbortAsk} onConfirm={confirmAbort} busy={busy} />
 				</div>
 			</div>
+			{isLearningLesson && codeOpen && <ExerciseWorkspace lessonId={chatId} busy={busy || compacting} onClose={() => setCodeOpen(false)} onSubmit={(text) => { void send({ type: "text", text }); }} />}
 		</div>
 		</CitationActionsContext.Provider>
 		</JobsContext.Provider>
