@@ -43,6 +43,6 @@ export function LessonControls({ chatId, busy, onContinue, onSession }: { chatId
 			{session?.phase === "review-gaps" && session.mode === "guided" && <button disabled={busy || saving} onClick={() => void act({ type: "continue-with-gaps" }, session.entryPoint === "grill" ? "Continue with these gaps recorded; grill the next section if there is one." : "Continue with these gaps recorded; explain the next section if there is one.")} className="rounded border px-3 py-1 disabled:opacity-40">Continue with gaps</button>}
 		</div>
 		{session && <p className="mt-2 text-xs text-muted-foreground">{{ "quick-check": "Brief opening check — optional, at most three questions.", outline: "Review the graphical plan, then start when ready.", explanation: "Learning mode — explanations and worked examples. Ask follow-ups freely.", grill: "Assessment mode — solve tasks; explanations of gaps follow the assessment.", "review-gaps": "Learning mode — revisit the gaps before a fresh retest.", complete: "Lesson finished — review your map and evidence." }[session.phase]}</p>}
-		{error && <p role="alert" className="mt-2 text-red-400">{error}</p>}
+		{error && <p role="alert" className="mt-2 text-error">{error}</p>}
 	</section>;
 }
