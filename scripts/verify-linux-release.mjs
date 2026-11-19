@@ -10,7 +10,8 @@ if (!directory) throw new Error("Usage: node scripts/verify-linux-release.mjs <d
 const { version } = JSON.parse(await readFile("package.json", "utf8"));
 const names = await readdir(directory);
 const packages = [];
-for (const extension of [".AppImage", ".deb", ".rpm", ".pacman"]) {
+// Disabled release formats: ".deb", ".rpm".
+for (const extension of [".AppImage", ".pacman"]) {
 	const matches = names.filter((name) => name.endsWith(extension));
 	if (matches.length !== 1) throw new Error(`Expected one ${extension} package, found ${matches.length}`);
 	const info = await stat(join(directory, matches[0]));
