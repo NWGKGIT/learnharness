@@ -180,6 +180,23 @@ linux:
   syncDesktopName: true
   # Both targets update via electron-updater 6.8.9. AppImage replaces its
   # own file; deb uses dpkg/apt and may request administrator permission.
+pacman:
+  # Override builder defaults: http-parser is no longer in Arch repositories,
+  # and libappindicator is the current package providing GTK3 tray support.
+  depends:
+    - c-ares
+    - ffmpeg
+    - gtk3
+    - libevent
+    - libvpx
+    - libxslt
+    - libxss
+    - minizip
+    - nss
+    - re2
+    - snappy
+    - libnotify
+    - libappindicator
 publish:
   # Update feed = GitHub Releases (decided 2026-10-08): latest-mac.yml +
   # zip/blockmap live on releases; electron-updater reads them anonymously.
