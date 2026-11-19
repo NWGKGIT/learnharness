@@ -29,7 +29,7 @@ See the [fork feature guide](docs/personal-learning-harness.md) for workflows, p
 
 ## Get started
 
-Linux x64 packages are intended for [this fork's GitHub Releases](https://github.com/NWGKGIT/learnharness/releases), with AppImage, Debian, RPM, and Arch/pacman builds configured in the release workflow. See [desktop releases](docs/desktop-release.md) for the current build and release process.
+Linux x64 packages are intended for [this fork's GitHub Releases](https://github.com/NWGKGIT/learnharness/releases), with AppImage and Arch/pacman builds configured in the release workflow. See [desktop releases](docs/desktop-release.md) for the current build and release process.
 
 To run from source with Node 26:
 

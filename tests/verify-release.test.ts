@@ -316,7 +316,10 @@ describe("Linux release workflow wiring", () => {
 		assert.equal(workflow.jobs.release.if, "github.event_name == 'push'");
 		assert.deepEqual(workflow.jobs.release.permissions, { contents: "write" });
 		const steps = workflow.jobs.package.steps as any[];
-		assert.ok(steps.some((step) => step.run?.includes("--linux AppImage deb rpm pacman")));
+		assert.ok(steps.some((step) => step.run?.includes("--linux AppImage pacman --x64 --publish never")));
+		assert.ok(steps.some((step) => step.run?.includes("apt-get install -y libarchive-tools")));
+		const artifact = steps.find((step) => step.uses?.startsWith("actions/upload-artifact@"));
+		assert.deepEqual(artifact.with.path.trim().split("\n"), ["dist/*.AppImage", "dist/*.pacman", "dist/latest-linux.yml", "dist/SHA256SUMS"]);
 		assert.ok(steps.some((step) => step.run?.includes("verify-linux-release.mjs")));
 		assert.ok(workflow.jobs.release.steps.some((step: any) => step.run?.includes("sha256sum --check")));
 	});
